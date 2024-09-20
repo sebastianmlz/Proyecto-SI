@@ -1,5 +1,6 @@
 <script>
-
+	// Importar el componente HeaderItem
+	import HeaderItem from "./header__item.svelte";
 </script>
 
 <svelte:head>
@@ -7,76 +8,23 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<header class="header">
-	<div class="header__div">
-		<ul>
-			<li><div class="imagen"><img src="/escudo.png"></div></li>
-		</ul>
-		<ul>
-			<li class="header__item">Acerca de nosotros</li>
-			<li class="header__item">Contactanos</li>
-			<li class="header__item">Ingresar</li>
-			
+<header class="bg-blue-800 text-white">
+	<div class="w-full h-20 flex justify-between items-center">
+		<!-- Sección izquierda con imagen -->
+		<div class="ml-4">
+			<img src="/escudo.png" alt="Escudo" class="w-16 h-14">
+		</div>
+		<!-- Sección derecha con links -->
+		<ul class="flex space-x-6 mr-6">
+			<HeaderItem text="Acerca de nosotros" />
+			<HeaderItem text="Contactanos" />
+			<HeaderItem text="Ingresar" additionalClasses="bg-white text-blue-700 hover:border-black hover:bg-white" />
 		</ul>
 	</div>
-	
+
 </header>
 
 <main>
-	
+	<!-- Contenido del main -->
 </main>
 
-<style>
-
-	.header {
-		
-		background-color: #48e;
-		color: #efefef;
-		margin: 0;
-
-	}
-
-	.header__div {
-		width: 100%;
-		height: 5rem;
-		display: flex;
-		list-style-type: none;
-		justify-content:space-between;
-		align-items: center;
-	}
-
-	.imagen {
-		display: flex;
-		justify-content: left;
-		margin-left: 15px;
-	}
-
-	.header__div ul {
-		display: flex;
-		list-style-type: none;
-		justify-content:space-between;
-		align-items: center;
-	}
-
-	.header__item {
-		padding: 15px;
-		border: 2px solid #efefef;
-		border-radius: 15px;
-		gap: 20px;
-		margin: 5px 20px;
-		transition: color 0.3s ease, background-color 0.3s ease; 
-	}
-
-	.header__div img {
-		width: 4rem; 
-		height: 3.5rem; 
-		padding-left: 10px;
-		display: block;
-	}
-
-	.header__item:hover {
-		background-color: #efefef;
-		color: #48e;
-	}
-
-</style>
