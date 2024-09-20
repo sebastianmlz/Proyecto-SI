@@ -1,11 +1,12 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./src/**/*.{html,js,svelte,ts}'],
+module.exports = {
+  content: [
+    './src/**/*.{html,svelte,js}', // Asegúrate de incluir los archivos Svelte
+  ],
   theme: {
     extend: {},
   },
   plugins: [],
-}
+};
 
 
 
