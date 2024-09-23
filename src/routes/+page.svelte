@@ -20,8 +20,8 @@
 </svelte:head>
 
 
-<header class="bg-blue-800 text-white">
-	<div class="w-full h-20 flex justify-between items-center">
+<header class=" text-yellow-300">
+	<div class="w-full h-25 flex justify-between items-center">
 		<!-- Sección izquierda con imagen -->
 		<div class="ml-4">
 			<img src="/escudo.png" alt="Escudo" class="w-16 h-14">
@@ -30,7 +30,7 @@
 		<ul class="flex space-x-6 mr-6 list-none">
 			<HeaderItem text="Acerca de nosotros" />
 			<HeaderItem text="Contactanos" />
-			<Boton onClick={openModal} text="Ingresar" additionalClasses="bg-white text-blue-700 hover:border-black hover:bg-white text-lg" />
+			<Boton onClick={openModal} text="Ingresar" additionalClasses="bg-yellow-300 text-blue-700 hover:border-black hover:bg-white text-lg" />
 		</ul>
 	</div>
 
@@ -41,7 +41,7 @@
 
 <main class="{showModal ? 'opacar' : ''} relative bg-cover bg-center h-screen" style="background-image: url('/static/colegio.jpeg')">
 	<div class="absolute inset-0 bg-black opacity-50"></div> <!-- Capa negra con opacidad -->
-	<h1 class="relative z-10 text-white text-center text-pretty text-7xl p-16 pt-60 titulo-Animacion">Bienvenido a la web de control del colegio Cristo Rey  </h1>
+	<h1 class="relative z-10 text-white text-center text-pretty text-7xl p-16 m-0 pt-60 titulo-Animacion">Bienvenido a la web de control del colegio Cristo Rey  </h1>
 	<p class="text-white font-bold text-center text-3xl titulo-Animacion">Inicia sesion para ingresar</p>
 </main>
 

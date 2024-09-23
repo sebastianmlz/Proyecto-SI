@@ -14,6 +14,6 @@
 
 
 <li>
-	<button type="button" on:click={handleClick} class={`px-5 py-3 f border-2 border-white rounded-2xl hover:bg-white hover:text-blue-700 transition-colors ${additionalClasses}`}>
+	<button type="button" on:click={handleClick} class={`px-5 py-3 f border-2 border-white rounded-2xl hover:bg-yellow-300 hover:text-blue-700 transition-colors ${additionalClasses}`}>
 	{text}</button>
 </li>
