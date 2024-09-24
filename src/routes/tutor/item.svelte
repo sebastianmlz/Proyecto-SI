@@ -4,14 +4,14 @@
 	export let masClases = '';
 </script>
 
-<div class={` border-none m-10 flex items-center justify-center rounded-3xl hover:opacity-80 ${masClases}`}>
+<div class={` border-none m-20 mb-0 mt-10 flex items-center justify-center rounded-3xl hover:opacity-80 ${masClases}`}>
 	{texto}
 </div>
 
 <style>
     div{
-        width: 40rem;
-        height: 20rem;
+        width: 20rem;
+        height: 15rem;
         background-color: #fff;
         color: #000;
         font-size: 50px;

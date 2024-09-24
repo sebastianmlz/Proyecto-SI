@@ -1,10 +1,53 @@
 <script>
-    import Item from "./item.svelte";
-	let menuOpen = true;
+    import Item from "./item.svelte"; // Importar el componente Item
+    import { goto } from '$app/navigation'; // Importar la función para redirigir
+    import { userStore } from '../../stores/userStore'; // Importar el store de usuario
+    import { onMount } from 'svelte'; // Importar onMount para gestionar suscripciones
+    import Perfil from './Perfil.svelte';
+    import Notificaciones from './Notificaciones.svelte';
+	import MainPrincipal from "./mainPrincipal.svelte";
+    import Citaciones from "./citaciones.svelte";
+    import Mensajes from "./mensajes.svelte";
+    // Puedes crear e importar más componentes como Mensajes, Citaciones, Ajustes, etc.
 
-	const toggleMenu = () => {
-		menuOpen = !menuOpen;
-	};
+    let userInfo;
+
+    // Suscribirse al store para obtener la información del usuario
+    const unsubscribe = userStore.subscribe(value => {
+        userInfo = value;
+    });
+
+    // Limpia la suscripción cuando el componente se destruye
+    onMount(() => {
+        return () => {
+            unsubscribe();
+        };
+    });
+
+    // Función para cerrar sesión
+    const logout = () => {
+        // Eliminar la información del store
+        userStore.set({
+            usuario_id: null,
+            rol: null,
+            accessToken: null,
+            refreshToken: null
+        });
+        localStorage.removeItem('userInfo'); // Limpiar localStorage
+        // Redirigir a la página de login
+        goto('/');
+    };
+
+    let menuOpen = true;
+
+    const toggleMenu = () => {
+        menuOpen = !menuOpen;
+    };
+
+    let selectedOption = 'principal'; // Inicialmente selecciona la opción de "Perfil"
+    const changeOption = (option) => {
+        selectedOption = option; // Cambia la opción seleccionada
+    };
 </script>
 
 <aside class="sidebar {menuOpen ? 'menu-open' : ''}">
@@ -20,23 +63,20 @@
     </picture>
     <nav class="sidebar__nav">
         <ul>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={() => changeOption('notificaciones')}>
                 <span class="material-symbols-outlined">Notifications</span>
                 <a href="#">Notificaciones</a>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={() => changeOption('mensajes')}>
                 <span class="material-symbols-outlined">Mail</span>
                 <a href="#">Mensajes</a>
             </li>
-            <!-- <li class="sidebar__item">
-                <span class="material-symbols-outlined">Shopping_cart</span>
-                <a href="#">Citaciones</a>
-            </li> -->
-            <li class="sidebar__item">
+            <!-- Puedes añadir más opciones aquí -->
+            <li class="sidebar__item" on:click={() => changeOption('citaciones')}>
                 <span class="material-symbols-outlined">account_balance</span>
                 <a href="#">Citaciones</a>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={() => changeOption('ajustes')}>
                 <span class="material-symbols-outlined">settings</span>
                 <a href="#">Ajustes</a>
             </li>
@@ -44,36 +84,47 @@
     </nav>
     <div class="sidebar__profile">
         <ul class="p-0">
-            <li class="sidebar__item item--profile">
+            <li class="sidebar__item item--profile" on:click={() => changeOption('perfil')}>
                 <img src="saul.png">
                 <span class="profile-option">Perfil</span>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={logout}>
                 <span class="material-symbols-outlined">logout</span>
-                <a href="#">Salir</a>
+                <a href="#">Salir</a> <!-- Llama a la función logout -->
             </li>
         </ul>
     </div>
 </aside>
 
-<main class="main opacity-80 w-[calc(100%-5rem)] text-white ml-20 relative bg-cover bg-center h-screen" >
-    <div class="info flex flex-wrap justify-center m-20">
-        <Item texto="hola"/>
-        <Item texto="hola"/>
-        <Item texto="hola"/>
-        <Item texto="hola"/>
-    </div>
-    
+<main class="main opacity-80 w-[calc(100%-5rem)] text-white ml-20 relative bg-cover bg-center h-screen">
+    <!-- Mostrar contenido dinámico basado en la opción seleccionada -->
+    {#if selectedOption === 'principal'}
+        <MainPrincipal/> <!-- Componente Principal -->
+    {:else if selectedOption === 'perfil'}
+        <Perfil {userInfo} /> <!-- Componente Perfil -->
+    {:else if selectedOption === 'notificaciones'}
+        <Notificaciones /> <!-- Componente Notificaciones -->
+    {:else if selectedOption === 'mensajes'}
+        <!-- Aquí puedes agregar el componente Mensajes -->
+        <Mensajes />
+    {:else if selectedOption === 'citaciones'}
+        <!-- Aquí puedes agregar el componente Citaciones -->
+        <Citaciones />
+    {:else if selectedOption === 'ajustes'}
+        <!-- Aquí puedes agregar el componente Ajustes -->
+        <!-- <Ajustes /> -->
+    {/if}
 </main>
 
 
 <style>
+    /* Puedes mantener tus estilos actuales o ajustarlos según sea necesario */
 
     * {
         box-sizing: border-box;
     }
 
-    div, ul, li, a, h2,h1 {
+    div, ul, li, a, h2, h1 {
         margin: 0;
     }
 
@@ -82,16 +133,15 @@
     }
 
     .opacar {
-		opacity: 0.9;
-		transition: opacity 0.3s ease;
-	}
-
+        opacity: 0.9;
+        transition: opacity 0.3s ease;
+    }
 
     .sidebar {
         background-color: var(--sidebar-color);
         position: fixed;
-        height: 100dvh;
-        width:clamp(200px,230px,250px);
+        height: 100%;
+        width: clamp(200px, 230px, 250px);
         font-size: clamp(1rem, 2.5vw, 3rem);
         display: flex;
         flex-direction: column;
@@ -108,7 +158,6 @@
         width: 4.5rem;
         transition: width 0.5s ease;
     }
-
 
     .sidebar__form button {
         background-color: var(--bg-color);
@@ -136,10 +185,10 @@
         display: flex;
     }
 
-    .sidebar__nav ul{
+    .sidebar__nav ul {
         display: flex;
         flex-direction: column;
-        justify-content:center;
+        justify-content: center;
         width: 100%;
         padding: 0;
     }
@@ -156,12 +205,11 @@
         border-radius: 36px 0 0 36px;
         position: relative;
         transition: background-position 0.6s ease, color 0.6s ease; /* Transición suave */
-}
+    }
 
     .sidebar__item a {
         color: inherit;
         text-decoration: none;
-        /* font-size: clamp(0.5rem, 0.7rem, 1rem); */
     }
 
     .sidebar__item span {
@@ -172,10 +220,9 @@
     .sidebar__item:hover {
         background-color: var(--bg-color);
         color: var(--sidebar-color);
-        background: linear-gradient(to left, var(--bg-color) 50%, var(--sidebar-color) 50%); 
+        background: linear-gradient(to left, var(--bg-color) 50%, var(--sidebar-color) 50%);
         background-size: 200% 100%; /* Doble ancho */
-        background-position: right ; /* Inicia con el fondo movido hacia la derecha */
-
+        background-position: right; /* Inicia con el fondo movido hacia la derecha */
     }
 
     .sidebar__item::before,
@@ -188,7 +235,6 @@
         height: 18px;
         background-color: transparent;
         transition: border-radius 1s, box-shadow 1s ease;
-        
     }
 
     .sidebar__item:hover::before {
@@ -203,7 +249,7 @@
         box-shadow: 4px -4px 0px 4px var(--bg-color);
     }
 
-    /*sidebar picture styles*/
+    /* Estilos de la imagen del sidebar */
 
     .sidebar__picture {
         margin-left: 1.5rem;
@@ -216,10 +262,9 @@
         margin: auto;
         opacity: .9;
         transition: width 0.5s ease;
-        /* filter: hue-rotate(-22deg); */
     }
 
-    /*sidebar profile menu styles*/
+    /* Estilos del perfil en el sidebar */
 
     .sidebar__profile img {
         border-radius: 50%;
@@ -230,7 +275,6 @@
         font-size: .8rem;
         padding: 0 12px 0 9px;
         color: inherit;
-        padding: 0;
     }
 
     .item--profile {
@@ -240,7 +284,7 @@
     }
 
     .item--profile:hover {
-        border-radius:25px ;
+        border-radius: 25px;
         color: var(--sidebar-color);
     }
 
@@ -248,16 +292,14 @@
         opacity: .7;
     }
 
-    .item--profile::before, .item--profile::after {
+    .item--profile::before,
+    .item--profile::after {
         display: none;
     }
 
     /* Modificación para cuando el menú está abierto */
-    .sidebar.menu-open {
-        /* width: fit-content; */
-    }
 
-    .sidebar.menu-open .sidebar__picture img{
+    .sidebar.menu-open .sidebar__picture img {
         width: 3.4rem;
     }
 
@@ -280,18 +322,10 @@
         width: fit-content;
     }
 
-    @keyframes sidebarAnimation{
-        0%{
-
-        }
-    }
-
     @media (max-width: 900px) {
         .main h1 {
             padding-top: 15rem;
         }
     }
-
-
-
 </style>
+

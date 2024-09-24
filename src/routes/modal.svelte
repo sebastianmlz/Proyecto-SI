@@ -1,10 +1,13 @@
 <script>
-    export let showModal = false;
+    import { userStore } from '../stores/userStore'; // Importa el store
+    import { goto } from '$app/navigation'; // Importa goto para redireccionar
+    import axios from 'axios'; // Importa axios para realizar las solicitudes
+    //import Cookies from 'js-cookie'; // Importa js-cookie para manejar las cookies
 
+    export let showModal = false;
     const closeModal = () => {
         showModal = false;
     };
-
 
     let ci = ''; // Variable para el Carnet de Identidad
     let password = '';
@@ -12,6 +15,7 @@
     let success = '';
     let ciError = '';
     let passwordError = '';
+    let seba = 'https://cr.panel.api.cristorey.lat/api';
 
     // Función de validación básica
     const validate = () => {
@@ -40,34 +44,46 @@
         if (!validate()) {
             return;
         }
-
+        
         try {
-        const response = await fetch('https://cr.panel.api.cristorey.lat/api/auth/login/', { // Usar el endpoint correcto y proxy si está configurado
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ci, contrasena: password }) // Enviar CI y Contraseña
-        });
+            const response = await fetch(`${seba}/auth/login/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ci, contrasena: password })
+            });
 
-        if (!response.ok) {
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Error en la autenticación');
+            }
+
             const data = await response.json();
-            throw new Error(data.error || 'Error en la autenticación');
-        }
+            success = 'Inicio de sesión exitoso!';
+            console.log('Respuesta del servidor:', data);
 
-        const data = await response.json();
-        success = 'Inicio de sesión exitoso!';
-        console.log('Respuesta del servidor:', data);
-        // Manejar la redirección o almacenamiento de tokens aquí
-        // Por ejemplo:
-        // localStorage.setItem('accessToken', data.access);
-        // localStorage.setItem('refreshToken', data.refresh);
+            // Guardar la información del usuario en el store
+            userStore.set({
+                usuario_id: data.usuario_id,
+                rol: data.rol,
+                accessToken: data.access,   // Cambia a `access` en lugar de `access_token`
+                refreshToken: data.refresh  // Cambia a `refresh` en lugar de `refresh_token`
+            });
+
+            // Redirigir según el rol del usuario
+            if (data.rol === 'P') {
+                goto('/tutor'); // Redirigir al tutor
+            }
+
         } catch (err) {
-        error = err.message;
-        console.error('Error de CORS o de autenticación:', err);
+            error = err.message;
+            console.error('Error de CORS o de autenticación:', err);
         }
-    }
+    };
+
 </script>
+
 
 {#if showModal}
     <div class="modal-overlay" on:click={closeModal}></div>
