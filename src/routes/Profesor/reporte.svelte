@@ -1,5 +1,9 @@
 <script>
-import SideBar from "./SideBar.svelte";
+    let studentName = '';
+    let course = '';
+    let conduct = '';
+    let performance = '';
+    let observations = '';
 </script>
 <main class="main  w-[calc(100%-5rem)] text-white ml-20  relative bg-cover bg-center h-screen">
     <div class="notificaciones flex flex-col col-auto">
