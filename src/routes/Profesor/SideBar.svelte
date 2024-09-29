@@ -1,10 +1,21 @@
 <script>
     import Item from "./item.svelte";
+    import Mensajes from "./mensajes.svelte";
+    import Notificacion from "./Notificacion.svelte";
+    import Citaciones from "./citaciones.svelte";
+	import Reporte from "./reporte.svelte";
+    import Asistencia from "./asistencia.svelte";
+
     let menuopen=true;
 
     const toggleMenu=() =>{
         menuopen=!menuopen
     }
+
+    let selectedOption = 'principal'; // Inicialmente selecciona la opción de "Perfil"
+    const changeOption = (option) => {
+        selectedOption = option; // Cambia la opción seleccionada
+    };
 </script>
 
 <aside class="sidebar {menuopen ? 'menu-open' : ''}">
@@ -20,27 +31,27 @@
     </picture>
     <nav class="sidebar__nav">
         <ul>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={()=>changeOption('notificaciones')}>
                 <span class="material-symbols-outlined">notifications</span>
                 <a href="#">Notificaciones</a>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={()=>changeOption('mensajes')}>
                 <span class="material-symbols-outlined">mail</span>
                 <a href="#">Mensajes</a>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={()=>changeOption('citaciones')}>
                 <span class="material-symbols-outlined">account_balance</span>
                 <a href="#">Citaciones</a>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={()=>changeOption('ajustes')}>
                 <span class="material-symbols-outlined">settings</span>
                 <a href="#">Ajustes</a>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={()=>changeOption('reporte')}>
                 <span class="material-symbols-outlined">problem</span>
                 <a href="#">Reporte</a>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={()=>changeOption('asistencia')}>
                 <span class="material-symbols-outlined">person</span>
                 <a href="#">Asistencia</a>
             </li>
@@ -60,6 +71,23 @@
         </ul>
     </div>
 </aside>
+
+<main class="main opacity-80 w-[calc(100%-5rem)] text-white ml-20 relative bg-cover bg-center h-screen">
+    <!-- Mostrar contenido dinámico basado en la opción seleccionada -->
+    {#if selectedOption === 'mensajes'}
+        <!-- Aquí puedes agregar el componente Mensajes -->
+        <Mensajes />
+    {:else if selectedOption ==='notificaciones'}
+        <Notificacion />
+    {:else if selectedOption === 'citaciones'}    
+        <Citaciones />
+    {:else if selectedOption === 'reporte'}
+        <Reporte />
+    {:else if selectedOption === 'asistencia'}
+        <Asistencia />
+    {/if}
+</main>
+
 <style>
 
     * {
