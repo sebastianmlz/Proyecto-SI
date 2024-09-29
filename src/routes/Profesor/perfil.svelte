@@ -1,22 +1,39 @@
 <script>
-    import { tutorStore } from '../../stores/tutorStore'; // Asegúrate de tener la ruta correcta
+    import { profesorStore } from '../../stores/profesorStore';
     import { onMount } from 'svelte';
-    import SideBarMenu from './SideBar_Menu.svelte';
+    import SideBar from './SideBar.svelte';
 
     export let userInfo; // Recibe la información del usuario desde el componente principal
-    let tutorInfo = {};
+    let profesorInfo = {};
 
     // Suscribirse al store de tutor para obtener la información
-    const unsubscribeTutor = tutorStore.subscribe(value => {
-        tutorInfo = value;
+    const unsubscribeProfesor = profesorStore.subscribe(value => {
+        profesorInfo = value;
     });
 
     // Limpia la suscripción cuando el componente se destruye
     onMount(() => {
         return () => {
-            unsubscribeTutor();
+            unsubscribeProfesor();
         };
     });
+
+    const handleLogout = () => {
+        // Limpiar los datos del tutor
+        profesorStore.set({
+        ci: null,
+        nombre: null,
+        apellido: null,
+        direccion: null,
+        telefono: null,
+        email: null,
+        imagen_perfil: null,
+        // es_activo: false,
+        fecha_ingreso: null
+        }); // Limpia los datos del tutor
+        localStorage.removeItem('profesorInfo'); // Limpia LocalStorage de tutor
+        // También puedes realizar otras acciones aquí, como redirigir
+    };
 
 </script>
 
@@ -29,10 +46,10 @@
                 <li>Rol: {userInfo.rol}</li>
                 <!-- <li>Token de acceso: {userInfo.accessToken}</li> -->
                 <!-- Mostrar datos del tutor -->
-                <li>CI: {tutorInfo.ci}</li>
-                <li>Nombre: {tutorInfo.nombre}</li>
-                <li>Apellido: {tutorInfo.apellido}</li>
-                <li>Dirección: {tutorInfo.direccion}</li>
+                <li>CI: {profesorInfo.ci}</li>
+                <li>Nombre: {profesorInfo.nombre}</li>
+                <li>Apellido: {profesorInfo.apellido}</li>
+                <li>Dirección: {profesorInfo.direccion}</li>
             </ul>
         </div>
     </div>

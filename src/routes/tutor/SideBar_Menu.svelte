@@ -2,15 +2,15 @@
     import Item from "./item.svelte"; // Importar el componente Item
     import { goto } from '$app/navigation'; // Importar la función para redirigir
     import { userStore } from '../../stores/userStore'; // Importar el store de usuario
+    import { limpiarTutor } from "../../stores/tutorStore";
     import { onMount } from 'svelte'; // Importar onMount para gestionar suscripciones
     import Perfil from './Perfil.svelte';
     import Notificaciones from './Notificaciones.svelte';
 	import MainPrincipal from "./mainPrincipal.svelte";
     import Citaciones from "./citaciones.svelte";
-    import Mensajes from "./mensajes.svelte";
-    // Puedes crear e importar más componentes como Mensajes, Citaciones, Ajustes, etc.
+    import Mensajes from "./mensajes.svelte"; 
 
-    let userInfo;
+    let userInfo = {};
 
     // Suscribirse al store para obtener la información del usuario
     const unsubscribe = userStore.subscribe(value => {
@@ -26,14 +26,16 @@
 
     // Función para cerrar sesión
     const logout = () => {
-        // Eliminar la información del store
+        //Eliminar la información del store del usuario
         userStore.set({
             usuario_id: null,
             rol: null,
             accessToken: null,
             refreshToken: null
         });
-        localStorage.removeItem('userInfo'); // Limpiar localStorage
+        limpiarTutor(); //Eliminar informacion del store del tutor
+        localStorage.removeItem('userInfo'); // Limpiar localStorage de usuario
+        localStorage.removeItem('tutorInfo'); // Limpiar localStorage de tutor
         // Redirigir a la página de login
         goto('/');
     };
@@ -50,33 +52,33 @@
     };
 </script>
 
-<aside class="sidebar {menuOpen ? 'menu-open' : ''}">
+<aside class="sidebar {menuOpen ? 'menu-open' : ''} bg-[--sidebar-color] fixed flex flex-col justify-between p-[30px_0_30px_6px] z-[100]">
     <form class="sidebar__form">
         <!-- Botón para abrir/cerrar el menú -->
-        <button type="button" class="material-symbols-outlined" on:click={toggleMenu}>
+        <button type="button" class="material-symbols-outlined bg-[--bg-color] text-[--sidebar-color] p-[0.4rem] border-none cursor-pointer absolute top-[6rem] right-[-25px] mb-[2rem]" on:click={toggleMenu}>
             {menuOpen ? 'menu' : 'menu_open'}
         </button>
     </form>
-    <picture class="sidebar__picture">
+    <picture class="sidebar__picture ml-[1.5rem] relative z-10">
         <source srcset="/static/escudo.png" media="(max-width:57.5rem)">
-        <img src="/static/escudo.png">
+        <img src="/static/escudo.png" class="m-auto opacity-[0.9]">
     </picture>
-    <nav class="sidebar__nav">
-        <ul>
-            <li class="sidebar__item" on:click={() => changeOption('notificaciones')}>
+    <nav class="sidebar__nav flex flex-1">
+        <ul class="flex flex-col justify-center w-[100%] p-0">
+            <li class="sidebar__item flex align-middle uppercase text-[--sidebar-color] relative" on:click={() => changeOption('notificaciones')}>
                 <span class="material-symbols-outlined">Notifications</span>
                 <a href="#">Notificaciones</a>
             </li>
-            <li class="sidebar__item" on:click={() => changeOption('mensajes')}>
+            <li class="sidebar__item flex align-middle uppercase text-[--sidebar-color] relative" on:click={() => changeOption('mensajes')}>
                 <span class="material-symbols-outlined">Mail</span>
                 <a href="#">Mensajes</a>
             </li>
             <!-- Puedes añadir más opciones aquí -->
-            <li class="sidebar__item" on:click={() => changeOption('citaciones')}>
+            <li class="sidebar__item flex align-middle uppercase text-[--sidebar-color] relative" on:click={() => changeOption('citaciones')}>
                 <span class="material-symbols-outlined">account_balance</span>
                 <a href="#">Citaciones</a>
             </li>
-            <li class="sidebar__item" on:click={() => changeOption('ajustes')}>
+            <li class="sidebar__item flex align-middle uppercase text-[--sidebar-color] relative" on:click={() => changeOption('ajustes')}>
                 <span class="material-symbols-outlined">settings</span>
                 <a href="#">Ajustes</a>
             </li>
@@ -84,11 +86,11 @@
     </nav>
     <div class="sidebar__profile">
         <ul class="p-0">
-            <li class="sidebar__item item--profile" on:click={() => changeOption('perfil')}>
-                <img src="saul.png">
+            <li class="sidebar__item item--profile w-fit text-[--text-color] flex align-middle uppercase text-[--sidebar-color] relative" on:click={() => changeOption('perfil')}>
+                <img src="saul.png" class="w-[2rem] rounded-[50%]">
                 <span class="profile-option">Perfil</span>
             </li>
-            <li class="sidebar__item" on:click={logout}>
+            <li class="sidebar__item flex align-middle uppercase text-[--sidebar-color] relative" on:click={logout}>
                 <span class="material-symbols-outlined">logout</span>
                 <a href="#">Salir</a> <!-- Llama a la función logout -->
             </li>
@@ -138,19 +140,12 @@
     }
 
     .sidebar {
-        background-color: var(--sidebar-color);
-        position: fixed;
         height: 100%;
         width: clamp(200px, 230px, 250px);
         font-size: clamp(1rem, 2.5vw, 3rem);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 30px 0 30px 6px;
         transition: width 0.5s ease;
         border-top-right-radius: 15px;
         border-bottom-right-radius: 15px;
-        z-index: 100;
     }
 
     /* Cuando el menú está abierto */
@@ -160,17 +155,8 @@
     }
 
     .sidebar__form button {
-        background-color: var(--bg-color);
-        color: var(--sidebar-color);
         font-size: 2rem;
         border-radius: 50%;
-        padding: .4rem;
-        border: none;
-        cursor: pointer;
-        position: absolute;
-        top: 6rem;
-        right: -25px;
-        margin-bottom: 2rem;
         transition: background-color 0.4s, color 0.4s;
     }
 
@@ -180,30 +166,14 @@
         color: var(--bg-color);
     }
 
-    .sidebar__nav {
-        flex: 1;
-        display: flex;
-    }
-
-    .sidebar__nav ul {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        width: 100%;
-        padding: 0;
-    }
 
     .sidebar__item {
         list-style: none;
-        display: flex;
         align-items: center;
-        text-transform: uppercase;
-        color: var(--sidebar-color);
         font-size: .9rem;
         padding-right: 6px;
         color: var(--bg-color);
         border-radius: 36px 0 0 36px;
-        position: relative;
         transition: background-position 0.6s ease, color 0.6s ease; /* Transición suave */
     }
 
@@ -251,25 +221,12 @@
 
     /* Estilos de la imagen del sidebar */
 
-    .sidebar__picture {
-        margin-left: 1.5rem;
-        position: relative;
-        z-index: 10;
-    }
-
     .sidebar__picture img {
         width: clamp(4rem, 75%, 20rem);
-        margin: auto;
-        opacity: .9;
         transition: width 0.5s ease;
     }
 
     /* Estilos del perfil en el sidebar */
-
-    .sidebar__profile img {
-        border-radius: 50%;
-        width: 2rem;
-    }
 
     .item--profile .profile-option {
         font-size: .8rem;
@@ -280,7 +237,7 @@
     .item--profile {
         margin: 12px;
         width: fit-content;
-        color: var(--text-color);
+        /* color: var(--text-color); */
     }
 
     .item--profile:hover {

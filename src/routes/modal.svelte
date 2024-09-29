@@ -1,10 +1,12 @@
 <script>
-    import { userStore } from '../stores/userStore'; // Importa el store
+    import { userStore } from '../stores/userStore'; // Importa el store de usuario
+    import { tutorStore, setTutorData } from '../stores/tutorStore'; // Importa el store de tutor
+    import { profesorStore, setProfesorData } from '../stores/profesorStore'; // Importa el store de profesor
     import { goto } from '$app/navigation'; // Importa goto para redireccionar
     import axios from 'axios'; // Importa axios para realizar las solicitudes
-    //import Cookies from 'js-cookie'; // Importa js-cookie para manejar las cookies
 
     export let showModal = false;
+
     const closeModal = () => {
         showModal = false;
     };
@@ -71,10 +73,36 @@
                 refreshToken: data.refresh  // Cambia a `refresh` en lugar de `refresh_token`
             });
 
-            // Redirigir según el rol del usuario
+           // Consultar datos del tutor o profesor según el rol
+            
             if (data.rol === 'P') {
+                // Obtener datos del profesor
+                const profesorResponse = await fetch(`${seba}/auth/profesores/${data.usuario_id}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${data.access}`, // Asegúrate de usar el token correcto
+                        'Content-Type': 'application/json'
+                    }
+                });                
+                const profesorData = await profesorResponse.json();
+                setProfesorData(profesorData); // Guarda los datos en el store de profesor
+                console.log('Respuesta del servidor, Profesor:', profesorData);
+                goto('/Profesor'); // Redirigir al profesor
+            } else if (data.rol === 'T') {
+                // Obtener datos del tutor
+                const tutorResponse = await fetch(`${seba}/auth/tutores/${data.usuario_id}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${data.access}`, // Asegúrate de usar el token correcto
+                        'Content-Type': 'application/json'
+                    }
+                });   
+                const tutorData = await tutorResponse.json();
+                setTutorData(tutorData); // Guarda los datos en el store de tutor
+                console.log('Respuesta del servidor, TUTOR:', tutorData);
                 goto('/tutor'); // Redirigir al tutor
             }
+
 
         } catch (err) {
             error = err.message;
@@ -86,83 +114,36 @@
 
 
 {#if showModal}
-    <div class="modal-overlay" on:click={closeModal}></div>
-    <div class="modal-content">
-        <button class="close-btn text-white" on:click={closeModal}>x</button>
-        <form on:submit={handleSubmit}>
+    <div class="modal-overlay fixed top-0 left-0 bg-black opacity-50 z-10 w-[100dvw] h-[100dvh]" on:click={closeModal}></div>
+    <div class="modal-content fixed top-1/2 left-1/2 bg-white rounded-[10px] shadow-[0_0_30_#333] p-[2rem] z-20">
+        <button class="close-btn text-white absolute top-0 right-0 p-[2px_15px] bg-[#e55] cursor-pointer rounded-[10px] " on:click={closeModal}>x</button>
+        <form class="flex flex-col" on:submit={handleSubmit}>
             <label for="ci">ci</label>
-            <input type="text" id="ci" name="ci" placeholder="Nombre de usuario" bind:value={ci}>
+            <input class="mb-5 p-[0.5rem] rounded-[5px] border-[1px_solid_#ccc]" type="text" id="ci" name="ci" placeholder="Nombre de usuario" bind:value={ci}>
 
             <label for="password">Contrasena</label>
-            <input type="password" id="password" name="password" placeholder="Contrasena" bind:value={password}>
+            <input class="mb-5 p-[0.5rem] rounded-[5px] border-[1px_solid_#ccc]" type="password" id="password" name="password" placeholder="Contrasena" bind:value={password}>
 
-            <button type="submit">Ingresar</button>
+            <button class="p-[0.5rem] bg-[#48e] text-white border-none rounded-[5px] cursor-pointer" type="submit">Ingresar</button>
         </form>
         {#if error}
-            <p style="color: red;">{error}</p> <!-- Mensaje de error si ocurre -->
+            <p style="color: red">{error}</p> <!-- Mensaje de error si ocurre -->
         {/if}
     </div>
 {/if}
 
 <style>
-    /* Fondo semitransparente */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 10;
-    }
 
     /* Contenido del modal */
     .modal-content {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    z-index: 20;
-    box-shadow: 0 0 30px #333;
+        transform: translate(-50%, -50%);
     }
 
     /* Botón de cerrar */
     .close-btn {
-        position: absolute;
-        top: 0px;
-        right: 0;
-        padding: 2px 15px;
         font-size: 1.5rem;
-        cursor: pointer;
-        background-color: #e55;
-        border-radius: 10px;
         border-top-left-radius: 0px;
         border-bottom-right-radius: 0px;
-    }
-
-    /* Formulario */
-    form {
-        display: flex;
-        flex-direction: column;
-    }
-
-    input {
-        margin-bottom: 1rem;
-        padding: 0.5rem;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-    }
-
-    button[type="submit"] {
-        padding: 0.5rem;
-        background-color: #48e;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
     }
 
     /* Mensaje de error */

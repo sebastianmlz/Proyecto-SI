@@ -1,10 +1,50 @@
 <script>
     import Item from "./item.svelte";
+    import { goto } from '$app/navigation'; // Importar la función para redirigir
+    import { userStore } from '../../stores/userStore'; // Importar el store de usuario
+    import { limpiarProfesor } from "../../stores/profesorStore";
+    import { onDestroy,onMount } from 'svelte'; // Importar onMount para gestionar suscripciones
     import Mensajes from "./mensajes.svelte";
     import Notificacion from "./Notificacion.svelte";
     import Citaciones from "./citaciones.svelte";
 	import Reporte from "./reporte.svelte";
     import Asistencia from "./asistencia.svelte";
+    import Perfil from "./perfil.svelte";
+    import { createEventDispatcher } from "svelte";
+
+    // Puedes crear e importar más componentes como Mensajes, Citaciones, Ajustes, etc.
+
+    let userInfo = {};
+
+    // Suscribirse al store para obtener la información del usuario
+    const unsubscribe = userStore.subscribe(value => {
+        userInfo = value;
+    });
+
+    // Limpia la suscripción cuando el componente se destruye
+    onMount(() => {
+        return () => {
+            unsubscribe();
+        };
+    });
+
+    // Función para cerrar sesión
+    const dispatch = createEventDispatcher();
+    const logout = () => {
+        // Eliminar la información del store
+        userStore.set({
+            usuario_id: null,
+            rol: null,
+            accessToken: null,
+            refreshToken: null
+        });
+        limpiarProfesor();
+        dispatch('logout');
+        localStorage.removeItem('userInfo'); // Limpiar localStorage de usuario
+        localStorage.removeItem('profesorInfo'); //limpia localStorage de profesor
+        // Redirigir a la página de login
+        goto('/');
+    };
 
     let menuopen=true;
 
@@ -60,11 +100,11 @@
 
     <div class="sidebar__profile">
         <ul class="p-0">
-            <li class="sidebar__item item--profile">
+            <li class="sidebar__item item--profile" on:click={()=>changeOption('perfil')}>
                 <img src="saul.png">
                 <span class="profile-option">Perfil</span>
             </li>
-            <li class="sidebar__item">
+            <li class="sidebar__item" on:click={logout}>
                 <span class="material-symbols-outlined">logout</span>
                 <a href="#">Salir</a>
             </li>
@@ -85,6 +125,8 @@
         <Reporte />
     {:else if selectedOption === 'asistencia'}
         <Asistencia />
+    {:else if selectedOption === 'perfil'}
+        <Perfil {userInfo}/>
     {/if}
 </main>
 
