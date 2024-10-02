@@ -55,6 +55,9 @@
     </div>
 </main>
 
+
+
+
 <style>
     /* Añade aquí los estilos para el perfil */
 </style>

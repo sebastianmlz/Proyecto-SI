@@ -1,7 +1,45 @@
 <script>
+import Perfil from "./perfil.svelte";
+import { goto } from "$app/navigation";
+import { userStore } from "../../stores/userStore";
+import { limpiarDirector } from"../../stores/directorStore"; 
+import { onDestroy,onMount } from "svelte";
+import { createEventDispatcher } from "svelte";
+
+
+let userInfo = {};
+
+    // Suscribirse al store para obtener la información del usuario
+    const unsubscribe = userStore.subscribe(value => {
+        userInfo = value;
+    });
+
+// Limpia la suscripción cuando el componente se destruye
+onMount(() => {
+        return () => {
+            unsubscribe();
+        };
+    });
+
+    // Función para cerrar sesión
+    const dispatch = createEventDispatcher();
+    const logout = () => {
+        // Eliminar la información del store
+        userStore.set({
+            usuario_id: null,
+            rol: null,
+            accessToken: null,
+            refreshToken: null
+        });
+        limpiarDirector();
+        dispatch('logout');
+        localStorage.removeItem('userInfo'); // Limpiar localStorage de usuario
+        localStorage.removeItem('profesorInfo'); //limpia localStorage de profesor
+        // Redirigir a la página de login
+        goto('/');
+    };
 
 let menuOpen = true;
-
     const toggleMenu = () => {
         menuOpen = !menuOpen;
     };
@@ -46,7 +84,8 @@ let menuOpen = true;
     </nav>
     <div class="sidebar__profile">
         <ul class="p-0">
-            <li class="sidebar__item item--profile">
+            <li class="sidebar__item item--profile"on:click={()=>changeOption('perfil')}>
+            <li class="sidebar__item item--profile" on:click={()=>changeOption('perfil')}>    
                 <img src="saul.png">
                 <span class="profile-option">Perfil</span>
             </li>
@@ -58,7 +97,11 @@ let menuOpen = true;
     </div>
 </aside>
 
-
+<main class="main opacity-80 w-[calc(100%-5rem)] text-white ml-20 relative bg-cover bg-center h-screen">
+    {#if selectedOption === 'perfil'}
+        <Perfil {userInfo}/>
+    {/if}
+</main>
 <style>
      .sidebar {
         background-color: var(--sidebar-color);
